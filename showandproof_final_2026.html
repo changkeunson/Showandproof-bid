@@ -593,7 +593,13 @@ function mgrRender() {
 }
 function mTog(id){ document.getElementById('mc_'+id).classList.toggle('exp'); }
 function mStat(id,status){ var s=gS(id); s.status=status; sS(id,s); mgrAll(); }
-functid; })[0];
+function mChk(id,idx,val){
+  var s=gS(id); if(!s.checks) s.checks={};
+  s.checks[idx]=val; sS(id,s);
+  var card=document.getElementById('mc_'+id);
+  var labels=card.querySelectorAll('.mci');
+  if(labels[idx]){ if(val) labels[idx].classList.add('done'); else labels[idx].classList.remove('done'); }
+  var bid=BIDS.filter(function(b){ return b.id===id; })[0];
   var done=Object.values(s.checks).filter(Boolean).length;
   var total=bid.checks.length;
   var pct=Math.round(done/total*100);
