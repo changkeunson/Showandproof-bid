@@ -1,1 +1,632 @@
-<h1>테스트</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쇼앤프루프 2026 공공입찰 전략 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--dark:#1a1d2e;--navy:#1e2a4a;--blue:#2563eb;--green:#16a34a;--green-bg:#f0fdf4;--green-b:#86efac;--amber:#d97706;--amber-bg:#fffbeb;--amber-b:#fcd34d;--red:#dc2626;--red-bg:#fef2f2;--red-b:#fca5a5;--info:#2563eb;--info-bg:#eff6ff;--info-b:#93c5fd;--gray:#6b7280;--border:#e5e7eb;--text:#111827;--sub:#6b7280}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+.report-header{background:var(--dark);color:white;padding:40px 40px 32px;position:relative;overflow:hidden}
+.report-header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(37,99,235,.3) 0%,transparent 70%);pointer-events:none}
+.report-header h1{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
+.report-header .sub{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:24px}
+.hstats{display:flex;gap:12px;flex-wrap:wrap}
+.hstat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 18px;text-align:center}
+.hstat .val{font-size:20px;font-weight:700;color:white}
+.hstat .lbl{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.nav-tabs{background:white;border-bottom:2px solid var(--border);padding:0 40px;display:flex;overflow-x:auto;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.nav-tab{padding:14px 18px;font-size:13px;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;user-select:none}
+.nav-tab:hover{color:var(--blue)}
+.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.nav-tab.mgr{color:var(--blue);font-weight:700}
+.content{padding:28px 40px;max-width:1100px;margin:0 auto}
+.page{display:none}
+.page.active{display:block}
+.sh{background:var(--navy);color:white;padding:14px 20px;border-radius:10px;margin-bottom:16px}
+.sh h2{font-size:16px;font-weight:700;margin-bottom:3px}
+.sh .meta{font-size:12px;color:rgba(255,255,255,.55)}
+.alert{padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:16px;border-left:3px solid}
+.ag{background:var(--green-bg);border-color:var(--green);color:#14532d}
+.ar{background:var(--red-bg);border-color:var(--red);color:#7f1d1d}
+.aa{background:var(--amber-bg);border-color:var(--amber);color:#78350f}
+.ab{background:var(--info-bg);border-color:var(--info);color:#1e3a8a}
+.at{width:100%;border-collapse:collapse;margin-bottom:20px}
+.at th{background:var(--navy);color:white;padding:10px 16px;font-size:13px;font-weight:700;text-align:left;width:180px}
+.at td{padding:11px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.65}
+.at tr:last-child td{border-bottom:none}
+.at tr:nth-child(odd) td{background:#fafafa}
+.at tr:nth-child(even) td{background:white}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-right:4px}
+.bok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+.bwarn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b)}
+.bred{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)}
+.binfo{background:var(--info-bg);color:var(--info);border:1px solid var(--info-b)}
+.bgray{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}
+.pr{display:flex;align-items:center;gap:10px;margin:4px 0}
+.pl{font-size:12px;color:var(--sub);width:200px;flex-shrink:0}
+.pbg{flex:1;background:#e5e7eb;border-radius:4px;height:7px;overflow:hidden}
+.pf{height:7px;border-radius:4px}
+.pv{font-size:12px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
+.as{background:var(--dark);border-radius:10px;padding:16px 20px;margin-top:4px}
+.as h3{color:white;font-size:13px;font-weight:700;margin-bottom:10px}
+.ai{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.07);align-items:flex-start}
+.ai:last-child{border-bottom:none}
+.ad{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.adr{background:rgba(220,38,38,.2);color:#fca5a5}
+.ada{background:rgba(217,119,6,.2);color:#fcd34d}
+.adg{background:rgba(22,163,74,.2);color:#86efac}
+.adb{background:rgba(37,99,235,.2);color:#93c5fd}
+.at2{color:rgba(255,255,255,.8);font-size:12px;line-height:1.6}
+.cc{background:white;border-radius:10px;border:1px solid var(--border);padding:14px 18px;margin-bottom:10px;display:flex;gap:16px;align-items:center;transition:box-shadow .15s}
+.cc:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.cn{font-size:22px;font-weight:900;width:36px;flex-shrink:0;text-align:center}
+.ci{flex:1}
+.cname{font-size:14px;font-weight:700;margin-bottom:4px}
+.cmeta{font-size:12px;color:var(--sub)}
+.cr{text-align:right;flex-shrink:0}
+.cprob{font-size:18px;font-weight:900}
+.cst{font-size:12px;margin-top:3px}
+.rc{background:white;border:1px solid var(--red-b);border-left:4px solid var(--red);border-radius:8px;padding:12px 16px;margin-bottom:8px}
+.rn{font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px}
+.rm{font-size:12px;color:var(--sub);margin-bottom:6px}
+.rr{font-size:12px;color:var(--text);line-height:1.6}
+.tt{width:100%;border-collapse:collapse}
+.tt td{padding:9px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:top}
+.tt td:first-child{width:120px;font-weight:700}
+.tt tr:nth-child(odd) td{background:#fafafa}
+.tt tr:nth-child(even) td{background:white}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.sc{background:white;border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:center}
+.sc .val{font-size:28px;font-weight:900;color:var(--blue)}
+.sc .lbl{font-size:12px;color:var(--sub);margin-top:2px}
+/* 일정관리 */
+.mtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.mtitle{font-size:15px;font-weight:700}
+.mdi{border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text);background:white;font-family:'Noto Sans KR',sans-serif;cursor:pointer}
+.mdi:focus{outline:none;border-color:var(--blue)}
+.sdot{width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block;opacity:0;transition:opacity .3s;margin-left:4px;vertical-align:middle}
+.sdot.on{opacity:1}
+.ms4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.msc{background:white;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.msv{font-size:24px;font-weight:700}
+.msl{font-size:11px;color:var(--sub);margin-top:3px}
+.mc{background:white;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;position:relative;transition:box-shadow .15s}
+.mc:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.mca{position:absolute;left:0;top:0;bottom:0;width:4px}
+.mh{display:flex;align-items:center;gap:10px;padding:13px 18px 13px 22px;cursor:pointer;user-select:none;transition:background .1s}
+.mh:hover{background:#f9fafb}
+.mdd{font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;white-space:nowrap;flex-shrink:0;min-width:54px;text-align:center}
+.dur{background:var(--red-bg);color:var(--red)}
+.dwn{background:var(--amber-bg);color:var(--amber)}
+.dok{background:var(--green-bg);color:var(--green)}
+.ddn{background:#f3f4f6;color:var(--gray)}
+.mi{flex:1;min-width:0}
+.mn{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mo{font-size:11px;color:var(--sub);margin-top:2px}
+.mr2{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mcnt{font-size:11px;color:var(--sub)}
+.msb{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid}
+.sa{background:var(--green-bg);color:#14532d;border-color:#86efac}
+.sp{background:var(--info-bg);color:#1e40af;border-color:#93c5fd}
+.ss{background:var(--amber-bg);color:#78350f;border-color:#fcd34d}
+.sw{background:var(--green-bg);color:#14532d;border-color:#4ade80;font-weight:700}
+.sl{background:var(--red-bg);color:#7f1d1d;border-color:#fca5a5}
+.sk{background:#f3f4f6;color:#374151;border-color:#d1d5db}
+.mchv{font-size:11px;color:#9ca3af;transition:transform .2s;flex-shrink:0}
+.mc.exp .mchv{transform:rotate(180deg)}
+.mpb{height:3px;background:var(--border)}
+.mpf{height:3px;transition:width .3s}
+.mb{display:none;padding:16px 20px;border-top:1px solid var(--border)}
+.mc.exp .mb{display:block}
+.mmt{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.mmi{font-size:12px;color:var(--sub)}
+.mmi strong{color:var(--text)}
+.mlbl{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin:14px 0 7px}
+.msr{display:flex;gap:6px;flex-wrap:wrap}
+.mstn{font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid #d1d5db;background:transparent;color:var(--sub);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .12s}
+.mstn:hover{background:#f3f4f6}
+.mstn.xactive{background:var(--green-bg);color:#14532d;border-color:#86efac;font-weight:700}
+.mstn.xprogress{background:var(--info-bg);color:#1e40af;border-color:#93c5fd;font-weight:700}
+.mstn.xsubmitted{background:var(--amber-bg);color:#78350f;border-color:#fcd34d;font-weight:700}
+.mstn.xwon{background:var(--green-bg);color:#14532d;border-color:#4ade80;font-weight:700}
+.mstn.xlost{background:var(--red-bg);color:#7f1d1d;border-color:#fca5a5;font-weight:700}
+.mstn.xskip{background:#f3f4f6;color:#374151;border-color:#d1d5db;font-weight:700}
+.mck{display:flex;flex-direction:column;gap:2px}
+.mci{display:flex;align-items:flex-start;gap:9px;padding:6px 9px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);line-height:1.6;transition:background .1s}
+.mci:hover{background:#f9fafb}
+.mci.done{color:#9ca3af;text-decoration:line-through}
+.mci input{margin-top:3px;flex-shrink:0;cursor:pointer;accent-color:var(--green);width:13px;height:13px}
+.mmo{width:100%;border:1px solid #d1d5db;border-radius:6px;padding:9px 11px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text);background:white;resize:vertical;min-height:64px;line-height:1.7}
+.mmo:focus{outline:none;border-color:var(--blue)}
+.mmo::placeholder{color:#9ca3af}
+@media(max-width:600px){.content{padding:16px}.nav-tabs{padding:0 16px}.report-header{padding:24px 16px}.ms4{grid-template-columns:repeat(2,1fr)}.g4{grid-template-columns:repeat(2,1fr)}.cc{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>쇼앤프루프(주) 2026 공공입찰 전략 리포트</h1>
+  <div class="sub">기준일: 2026년 4월 14일 · 내부 전략 회의용 자료</div>
+  <div class="hstats">
+    <div class="hstat"><div class="val">22건</div><div class="lbl">총 분석 건수</div></div>
+    <div class="hstat"><div class="val">5건</div><div class="lbl">도전 확정</div></div>
+    <div class="hstat"><div class="val">1건</div><div class="lbl">탈락 (KENTECH)</div></div>
+    <div class="hstat"><div class="val">15건</div><div class="lbl">포기 확정</div></div>
+    <div class="hstat"><div class="val">~8억</div><div class="lbl">잔여 수주 기회</div></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="go('list',this)">📋 도전 리스트</div>
+  <div class="nav-tab" onclick="go('p2',this)">01 고용정보원</div>
+  <div class="nav-tab" onclick="go('p3',this)">02 경복대 SNS</div>
+  <div class="nav-tab" onclick="go('p4',this)">03 소상공인 판로지원</div>
+  <div class="nav-tab" onclick="go('p5',this)">04 서울고속도로</div>
+  <div class="nav-tab" onclick="go('p6',this)">05 산단 행복일터</div>
+  <div class="nav-tab" onclick="go('closed',this)">🔒 탈락·포기</div>
+  <div class="nav-tab mgr" onclick="go('manager',this)">📅 일정관리</div>
+  <div class="nav-tab mgr" onclick="go('dashboard',this)">🌐 공고 대시보드</div>
+</div>
+
+<div class="content">
+
+<div id="list" class="page active">
+  <div class="sh"><h2>📋 도전 확정 리스트</h2><div class="meta">마감일 기준 오름차순 · 2026년 4월 14일 기준</div></div>
+  <div class="g4">
+    <div class="sc"><div class="val">5건</div><div class="lbl">도전 확정</div></div>
+    <div class="sc"><div class="val" style="color:var(--red)">3건</div><div class="lbl">이번 주 긴급 마감</div></div>
+    <div class="sc"><div class="val">~8억</div><div class="lbl">총 수주 기회</div></div>
+    <div class="sc"><div class="val" style="color:var(--green)">45~55%</div><div class="lbl">최고 수주 확률</div></div>
+  </div>
+  <div class="alert ar">🔴 KENTECH 낙찰하한선 미달 탈락 (25,189,900원 / 87.979%). 유한대 자격미충족 포기. 나머지 5건 집중.</div>
+  <div class="cc" style="border-left:4px solid var(--red)">
+    <div class="cn" style="color:var(--red)">01</div>
+    <div class="ci"><div class="cname">대학청년고용서비스 온·오프라인 홍보 용역</div><div class="cmeta">한국고용정보원 · 1억 5,710만원 · 협상 (기술90·가격10)</div></div>
+    <div class="cr"><div class="cprob" style="color:var(--red)">35~45%</div><div class="cst"><span class="badge bred">🔴 D-7</span></div><div class="cst" style="font-size:11px;color:var(--sub);margin-top:4px">4/21~23 제출</div></div>
+  </div>
+  <div class="cc" style="border-left:4px solid var(--red)">
+    <div class="cn" style="color:var(--red)">02</div>
+    <div class="ci"><div class="cname">2027학년도 경복대학교 온라인 SNS 입시홍보</div><div class="cmeta">경복대학교 · 2억원 · 협상 (기술50·가격50)</div></div>
+    <div class="cr"><div class="cprob" style="color:var(--red)">40~50%</div><div class="cst"><span class="badge bred">🔴 D-6</span></div><div class="cst" style="font-size:11px;color:var(--sub);margin-top:4px">4/20(월) 15:00 · PT 4/22</div></div>
+  </div>
+  <div class="cc" style="border-left:4px solid var(--red)">
+    <div class="cn" style="color:var(--red)">03</div>
+    <div class="ci"><div class="cname">소상공인 온라인판로 지원사업 통합홍보 용역</div><div class="cmeta">한국중소벤처기업유통원 · 2억 5,000만원 · 협상 (기술80·가격20)</div></div>
+    <div class="cr"><div class="cprob" style="color:var(--red)">40~50%</div><div class="cst"><span class="badge bred">🔴 D-7</span></div><div class="cst" style="font-size:11px;color:var(--sub);margin-top:4px">4/21~23 제출</div></div>
+  </div>
+  <div class="cc" style="border-left:4px solid var(--amber)">
+    <div class="cn" style="color:var(--amber)">04</div>
+    <div class="ci"><div class="cname">수도권1순환고속도로 고객만족·통행량 증대 홍보</div><div class="cmeta">서울고속도로(주) · 4,950만원 · 협상 (기술80·가격20)</div></div>
+    <div class="cr"><div class="cprob" style="color:var(--amber)">40~50%</div><div class="cst"><span class="badge bred">🔴 D-8</span></div><div class="cst" style="font-size:11px;color:var(--sub);margin-top:4px">4/22(수) 11:00 방문+나라장터</div></div>
+  </div>
+  <div class="cc" style="border-left:4px solid var(--blue)">
+    <div class="cn" style="color:var(--blue)">05</div>
+    <div class="ci"><div class="cname">산단 행복일터 프로젝트 홍보 운영 용역</div><div class="cmeta">한국산업단지경영자연합회 · 1억원 · 협상</div></div>
+    <div class="cr"><div class="cprob" style="color:var(--green)">45~55%</div><div class="cst"><span class="badge bwarn">📋 D-16</span></div><div class="cst" style="font-size:11px;color:var(--sub);margin-top:4px">4/30(목) 18:00 이메일</div></div>
+  </div>
+  <div class="sh" style="margin-top:24px"><h2>⏰ 이번 주 핵심 TO-DO</h2><div class="meta">4월 14일(월) 기준</div></div>
+  <table class="tt">
+    <tr><td><span class="badge bwarn">완료 확인</span></td><td>동양백반·조인·OTM 실적증명서 인감 날인 요청 완료 여부 · 서울보증보험 보증증권 발급 완료 여부 · 법인인감증명서·법인등기부등본 발급 완료 여부 · 창업기업확인서 신청 완료 여부 · 판판대로 채널 분석 완료 여부</td></tr>
+    <tr><td><span class="badge bred">오늘~4/19</span></td><td>고용정보원 + 경복대 + 소상공인 + 서울고속도로 제안서 동시 작성 · 수도권1순환 답사 (이번 주 내 완료)</td></tr>
+    <tr><td><span class="badge bred">4/20(월) D-6</span></td><td>경복대 SNS 나라장터 전자 제출 (15시 마감 — 오전 중 완료 목표)</td></tr>
+    <tr><td><span class="badge bred">4/21~23 D-7</span></td><td>고용정보원·소상공인 제출·개찰 · 서울고속도로 제본 9부 양주 방문 제출</td></tr>
+    <tr><td><span class="badge bred">4/22(수) D-8</span></td><td>경복대 PT 발표 (10시, 경복대 국제회의실) + 서울고속도로 방문 제출 (11시, 양주) — 역할 분리 필수</td></tr>
+    <tr><td><span class="badge bok">4/23~29</span></td><td>산단 행복일터 제안서 집중 작성</td></tr>
+    <tr><td><span class="badge bwarn">4/30(목) D-16</span></td><td>산단 건 이메일 제출 마감 (18시)</td></tr>
+  </table>
+</div>
+
+<div id="p2" class="page">
+  <div class="sh"><h2>01 · 대학청년고용서비스 온·오프라인 홍보 용역</h2><div class="meta">한국고용정보원 · 1억 5,710만원 · 4/21~23 제출</div></div>
+  <div class="alert ar">🔴 D-7 긴급 — 제안서 마감까지 1주일</div>
+  <table class="at">
+    <tr><th>① 수주 확률</th><td><div style="font-size:22px;font-weight:900;color:var(--red);margin-bottom:10px">35~45%</div><div class="pr"><span class="pl">자격 요건</span><div class="pbg"><div class="pf" style="width:100%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">✅</span></div><div class="pr"><span class="pl">디지털 콘텐츠 (20점)</span><div class="pbg"><div class="pf" style="width:90%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">강점</span></div><div class="pr"><span class="pl">오프라인 이벤트</span><div class="pbg"><div class="pf" style="width:30%;background:var(--red)"></div></div><span class="pv" style="color:var(--red)">약점</span></div>기술 90% + 가격 10%. 릴스·숏폼(250만뷰·160만뷰) → 디지털 콘텐츠 20점 직접 해당. 오프라인 이벤트 경험 부족이 최대 약점.</td></tr>
+    <tr><th>② 노력 비중</th><td><span class="badge bred">매우 높음</span> D-13 안에 인스타 3년치 정리, 콘텐츠 유형별 우수사례 4종, 오프라인 협력사 섭외, 제안서 전 항목 완료.</td></tr>
+    <tr><th>③ 없으면 안 될 것</th><td><span class="badge bred">0점 위험</span> 인스타 운영사례 (발주기관명·운영기간·성과수치)<br><br><span class="badge bred">0점 위험</span> 카드뉴스·인스타툰·밈·릴스 우수사례 각 1건<br><br><span class="badge bred">0점 위험</span> 인플루언서 영상 실적 + 조회수<br><br><span class="badge bwarn">필수</span> 청년·대학 대상 이벤트 실적</td></tr>
+    <tr><th>④ 일정 위험</th><td><span class="badge bred">최대</span> 경복대 마감(4/20) 다음 날부터 제출 시작 — 제안서 4/20 이전 완성 필수<br><br><span class="badge bwarn">주의</span> 신용평가등급 B- 나라장터 등록 여부 오늘 확인</td></tr>
+    <tr><th>⑤ 공략 포인트</th><td><span class="badge bok">핵심</span> 디지털 콘텐츠 20점 — 250만뷰·160만뷰 수치 증빙<br><br><span class="badge bok">전략</span> 2030 콘텐츠 실적을 대학청년 타겟과 연결<br><br><span class="badge bok">보완</span> 오프라인 협력사 파트너 명기로 실행 가능성 제시</td></tr>
+    <tr><th>⑥ 최종 판단</th><td><div class="alert ag" style="margin:0">✅ 도전 확정</div></td></tr>
+  </table>
+  <div class="as"><h3>🎯 Action Items</h3>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">나라장터 신용평가등급 B- 등록 여부 확인</div></div>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">인스타그램 운영사례 3년치 정리 (발주기관명·성과수치)</div></div>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">오프라인 협력사 컨택 (커피트럭·포토부스·인형탈)</div></div>
+    <div class="ai"><span class="ad ada">4/14~19</span><div class="at2">제안서 전 항목 작성 완료</div></div>
+    <div class="ai"><span class="ad adb">4/21~23</span><div class="at2">나라장터 PDF 제출 (300MB 이하)</div></div>
+  </div>
+</div>
+
+<div id="p3" class="page">
+  <div class="sh"><h2>02 · 2027학년도 경복대학교 SNS 입시홍보</h2><div class="meta">경복대학교 · 2억원 · 4/20(월) 15:00 마감 · PT 4/22(수) 10:00</div></div>
+  <div class="alert ar">🔴 D-6 긴급 — 4/20(월) 15시 나라장터 제출 마감. 제안서 이번 주 내 완성 필수.</div>
+  <table class="at">
+    <tr><th>① 수주 확률</th><td><div style="font-size:22px;font-weight:900;color:var(--amber);margin-bottom:10px">40~50%</div><div class="pr"><span class="pl">수행실적 (26건 만점)</span><div class="pbg"><div class="pf" style="width:100%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">5/5점</span></div><div class="pr"><span class="pl">가격 50% 역전 가능</span><div class="pbg"><div class="pf" style="width:85%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">유리</span></div><div class="pr"><span class="pl">대학 홍보 경험</span><div class="pbg"><div class="pf" style="width:20%;background:var(--red)"></div></div><span class="pv" style="color:var(--red)">없음</span></div>가격 50% 구조. 1.5~1.7억 수준 제안으로 대형사 역전 가능.</td></tr>
+    <tr><th>② 노력 비중</th><td><span class="badge bred">높음</span> 30쪽 PPT 8부 + PT 발표 준비. 다른 3건과 동시 진행.</td></tr>
+    <tr><th>③ 없으면 안 될 것</th><td><span class="badge bred">즉시</span> 입찰보증증권 1,000만원 (서울보증보험 1588-3900)<br><br><span class="badge bred">오늘</span> 국세·지방세 완납증명서 (정부24)<br><br><span class="badge bwarn">준비</span> 실적증명서 — SNS 홍보 5건 이상<br><br><span class="badge bwarn">PT 당일</span> 제안서 8부 경복대 방문</td></tr>
+    <tr><th>④ 일정 위험</th><td><span class="badge bred">최대</span> 4/20 마감 → 4/21 다른 건 제출 → 4/22 PT + 서울고속도로 방문 — 3일 연속<br><br><span class="badge bred">필수</span> 4/22 역할 분리 — PT 발표자 vs 양주 방문 제출자</td></tr>
+    <tr><th>⑤ 공략 포인트</th><td><span class="badge bok">핵심</span> 1.5~1.7억 제안 → 가격 50점 압도<br><br><span class="badge bok">이해도</span> RFP 수치(취업률 82.1%·진접역 개통 등) 시나리오 반영<br><br><span class="badge bok">실적</span> 26건 → 정량 만점</td></tr>
+    <tr><th>⑥ 최종 판단</th><td><div class="alert ag" style="margin:0">✅ 도전 확정 — 가격 50% 구조에서 역전 가능</div></td></tr>
+  </table>
+  <div class="as"><h3>🎯 Action Items</h3>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">서울보증보험(1588-3900) 입찰보증증권 발급 완료 여부</div></div>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">정부24 국세·지방세 완납증명서 발급 완료 여부</div></div>
+    <div class="ai"><span class="ad ada">4/14~19</span><div class="at2">제안서 작성 완료 · SEO·GDN 외부 파트너 확정</div></div>
+    <div class="ai"><span class="ad adr">4/20 오전</span><div class="at2">나라장터 전자 제출 완료 (마감 15시)</div></div>
+    <div class="ai"><span class="ad adr">4/22 10:00</span><div class="at2">경복대 국제회의실 PT — 제안서 8부 지참</div></div>
+  </div>
+</div>
+
+<div id="p4" class="page">
+  <div class="sh"><h2>03 · 소상공인 온라인판로 지원사업 통합홍보</h2><div class="meta">한국중소벤처기업유통원 · 2억 5,000만원 · 4/21~23 제출</div></div>
+  <div class="alert ar">🔴 D-7 긴급 — 고용정보원 건과 동일 일정. 이번 주 제안서 동시 완성 필수.</div>
+  <table class="at">
+    <tr><th>① 수주 확률</th><td><div style="font-size:22px;font-weight:900;color:var(--amber);margin-bottom:10px">40~50%</div><div class="pr"><span class="pl">소상공인 실적 연관성</span><div class="pbg"><div class="pf" style="width:95%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">최강점</span></div><div class="pr"><span class="pl">콘텐츠·SNS (30점)</span><div class="pbg"><div class="pf" style="width:90%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">강점</span></div>소상공인 26건이 발주기관과 직결. 수행능력 30점 최대 배점.</td></tr>
+    <tr><th>② 노력 비중</th><td><span class="badge bred">매우 높음</span> 별지 서식 9종 + 7개 섹션. 고용정보원과 마감 동일(4/21~23). 소상공인 실적 섹션 공통 활용 가능.</td></tr>
+    <tr><th>③ 없으면 안 될 것</th><td><span class="badge bred">필수</span> 별지 9종 전체<br><br><span class="badge binfo">만점</span> smpp.go.kr 창업기업확인서 → 신용평가 10점 만점</td></tr>
+    <tr><th>④ 일정 위험</th><td><span class="badge bred">최대</span> 고용정보원과 4/21~23 동일 — 팀 인력 배분 사전 확정 필수</td></tr>
+    <tr><th>⑤ 공략 포인트</th><td><span class="badge bok">차별화</span> "소상공인을 직접 홍보한 유일한 회사"로 포지셔닝<br><br><span class="badge bok">이해도</span> 판판대로 채널 사전 분석 → 현황 파악한 회사 어필</td></tr>
+    <tr><th>⑥ 최종 판단</th><td><div class="alert ag" style="margin:0">✅ 도전 확정 — 소상공인 실적 26건이 발주기관과 직결</div></td></tr>
+  </table>
+  <div class="as"><h3>🎯 Action Items</h3>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">판판대로 유튜브·인스타·페이스북·블로그 채널 현황 분석</div></div>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">smpp.go.kr 창업기업확인서 신청</div></div>
+    <div class="ai"><span class="ad ada">4/14~19</span><div class="at2">제안서 작성 — 소상공인 실적 섹션 고용정보원 건 공통 활용</div></div>
+    <div class="ai"><span class="ad adb">4/21~23</span><div class="at2">나라장터 PDF 제출</div></div>
+  </div>
+</div>
+
+<div id="p5" class="page">
+  <div class="sh"><h2>04 · 수도권1순환고속도로 고객만족·통행량 증대 홍보</h2><div class="meta">서울고속도로(주) · 4,950만원 · 4/22(수) 11:00 방문+나라장터 동시</div></div>
+  <div class="alert aa">⚠️ 나라장터 + 경기도 양주 방문 제출 동시 의무. 4/22 경복대 PT와 같은 날 — 역할 분리 필수.</div>
+  <table class="at">
+    <tr><th>① 수주 확률</th><td><div style="font-size:22px;font-weight:900;color:var(--amber);margin-bottom:10px">40~50%</div><div class="pr"><span class="pl">수행실적 5건 만점</span><div class="pbg"><div class="pf" style="width:100%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">10/10점</span></div><div class="pr"><span class="pl">SNS·영상 역량</span><div class="pbg"><div class="pf" style="width:90%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">강점</span></div><div class="pr"><span class="pl">언론홍보·오프라인</span><div class="pbg"><div class="pf" style="width:30%;background:var(--red)"></div></div><span class="pv" style="color:var(--red)">약점</span></div>3,000만원 이상 실적 5건 확인 (동양백반·조인·OTM). 정량 18~20점. 가격 20% 공략 가능.</td></tr>
+    <tr><th>② 노력 비중</th><td><span class="badge bwarn">높음</span> 30쪽 제안서 + 제본 9부 + 양주 방문 필수. 다른 건들과 동시 진행.</td></tr>
+    <tr><th>③ 없으면 안 될 것</th><td><span class="badge bred">핵심</span> 실적증명서 (별지 #8) — 발주기관 인감 날인. 동양백반·조인·OTM 오늘 연락<br><br><span class="badge bred">필수</span> 법인인감증명서·법인등기부등본 (4/10 이후 발행)<br><br><span class="badge bred">필수</span> 방문 제출 — 031-894-3090 사전 연락<br><br><span class="badge bwarn">필수</span> 4/22 역할 분리 — PT vs 양주 방문</td></tr>
+    <tr><th>④ 일정 위험</th><td><span class="badge bred">치명적</span> 4/22 경복대 PT(10시) + 양주 방문(11시) 동시 — 인력 분리 필수<br><br><span class="badge bred">긴급</span> 실적증명서 인감 최소 3~5일 — 오늘 연락 안 하면 불가<br><br><span class="badge bwarn">주의</span> 제본 9부 — 4/21 오후까지 완성</td></tr>
+    <tr><th>⑤ 공략 포인트</th><td><span class="badge bok">핵심</span> 정량 18~20점 — 경쟁사 대비 우위<br><br><span class="badge bok">가격</span> 3,800~4,200만원 수준 제안<br><br><span class="badge bok">이해도</span> 수도권1순환 구간 직접 답사 → 지역 특화 전략 반영</td></tr>
+    <tr><th>⑥ 최종 판단</th><td><div class="alert ag" style="margin:0">✅ 도전 확정 — 실적 5건 확인. 경복대 SNS와 병행 가능 (인력 분리 전제)</div></td></tr>
+  </table>
+  <div class="as"><h3>🎯 Action Items</h3>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">동양백반·조인·OTM 실적증명서 인감 날인 요청 — 회신 여부 체크</div></div>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">법인인감증명서·법인등기부등본 발급 (4/10 이후)</div></div>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">4/22 역할 확정 — 경복대 PT 발표자 vs 양주 방문 제출자</div></div>
+    <div class="ai"><span class="ad ada">4/14~19</span><div class="at2">수도권1순환 답사 + 제안서 작성</div></div>
+    <div class="ai"><span class="ad ada">4/21 오후</span><div class="at2">제본 9부 완료 + 나라장터 전자 제출</div></div>
+    <div class="ai"><span class="ad adr">4/22 11:00</span><div class="at2">팀원 양주 서울고속도로 방문 제출 (031-894-3090 사전 연락)</div></div>
+  </div>
+</div>
+
+<div id="p6" class="page">
+  <div class="sh"><h2>05 · 산단 행복일터 프로젝트 홍보 운영 용역</h2><div class="meta">한국산업단지경영자연합회 · 1억원 · 4/30(목) 18:00 이메일</div></div>
+  <div class="alert ab">📋 4/23 이후 집중 작성 — 진입 장벽 가장 낮음</div>
+  <table class="at">
+    <tr><th>① 수주 확률</th><td><div style="font-size:22px;font-weight:900;color:var(--green);margin-bottom:10px">45~55%</div><div class="pr"><span class="pl">자격 요건 (가장 느슨)</span><div class="pbg"><div class="pf" style="width:100%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">✅</span></div><div class="pr"><span class="pl">콘텐츠·영상 (35점)</span><div class="pbg"><div class="pf" style="width:90%;background:var(--green)"></div></div><span class="pv" style="color:var(--green)">강점</span></div>입찰보증금·신용평가·직접생산확인증명서 불필요. 이메일 제출.</td></tr>
+    <tr><th>② 노력 비중</th><td><span class="badge bok">낮음~보통</span> 4/23 이후 7일 집중 작성 가능. 서류 최소, 분량 자유.</td></tr>
+    <tr><th>③ 없으면 안 될 것</th><td><span class="badge bwarn">제안서</span> 수행계획서 + 가격제안서 + 참여인력계획 + 유사실적 증빙<br><br><span class="badge bok">불필요</span> 입찰보증금 없음 · 신용평가 없음 · 직접생산증명서 없음</td></tr>
+    <tr><th>④ 일정 위험</th><td><span class="badge bok">여유</span> 4/23부터 7일 — 도전 건 중 여유 최대<br><br><span class="badge bred">확인 필수</span> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6a0d1f18052a040b1c0f1844090507">[email&#160;protected]</a> 발주기관 공식 홈페이지 재확인</td></tr>
+    <tr><th>⑤ 공략 포인트</th><td><span class="badge bok">핵심</span> 수행역량 30점 — 26건 실적 조회수·도달수 포함<br><br><span class="badge binfo">가격</span> 8,000~9,000만원 공격적 제안 검토</td></tr>
+    <tr><th>⑥ 최종 판단</th><td><div class="alert ag" style="margin:0">✅ 도전 확정 — 진입 장벽 최소. 정부 레퍼런스 확보 가능.</div></td></tr>
+  </table>
+  <div class="as"><h3>🎯 Action Items</h3>
+    <div class="ai"><span class="ad adr">완료 확인</span><div class="at2">한국산업단지경영자연합회 홈페이지 — guro@naver.com 진위 확인</div></div>
+    <div class="ai"><span class="ad adg">4/23~29</span><div class="at2">제안서 집중 작성 + PR·광고 파트너 확정</div></div>
+    <div class="ai"><span class="ad adr">4/30 18:00</span><div class="at2">이메일 제출 — 수신 확인 메일 반드시 체크</div></div>
+  </div>
+</div>
+
+<div id="closed" class="page">
+  <div class="sh"><h2>🔒 탈락·포기 건 전체</h2><div class="meta">투찰 결과 탈락 1건 + 1차 필터 포기 15건 · 총 16건</div></div>
+  <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;letter-spacing:.5px">▸ 투찰 결과 탈락 (1건)</div>
+  <div class="rc" style="border-left-color:var(--red)">
+    <div class="rn">[탈락] KENTECH SNS 홍보대행 용역 — 낙찰하한선 미달</div>
+    <div class="rm">발주: 한국에너지공과대학교 · 예산: 2,850만원 · 소액수의 · 개찰: 2026.04.10</div>
+    <div class="rr"><span class="badge bred">탈락 사유</span> 투찰가 25,189,900원 (87.979%) — 낙찰하한선 88% 미달<br><br><span class="badge bgray">투찰가</span> 25,189,900원 (기초금액 28,498,000원 대비 87.979%)<br><span class="badge bgray">낙찰사</span> 마케팅인프라 / 25,201,000원 / 88.018%<br><span class="badge bgray">차이</span> 낙찰가와 <strong>11,100원</strong> 차이로 탈락<br><br><span class="badge binfo">분석</span> 총 70개 업체 중 62개 하한선 미달. 소액수의 구조적 한계. 내년 재도전 시 90~92% 구간 권고.</div>
+  </div>
+  <div style="font-size:12px;font-weight:700;color:var(--gray);margin:16px 0 8px;letter-spacing:.5px">▸ 1차 필터 포기 확정 (14건)</div>
+  <div class="rc"><div class="rn">01 · 2026년 김천시 공식 홍보영상 제작</div><div class="rm">발주: 김천시 · 예산: 7,548만원</div><div class="rr"><span class="badge bred">지역 제한</span> 소재지 경상북도 또는 대구광역시 조건. 경기 남양주 소재 불가.</div></div>
+  <div class="rc"><div class="rn">02 · 2026년 연암대학교 온라인·유튜브 입시홍보대행</div><div class="rm">발주: 연암대학교 · 예산: 1억 6,000만원</div><div class="rr"><span class="badge bred">실적 요건</span> 대학 홍보대행 단일건 8,000만원 이상 완료 필수. <span class="badge bred">입찰보증금</span> 800만원 납부.</div></div>
+  <div class="rc"><div class="rn">03 · 2026년 체육시설 안전이용·안전문화 확산 홍보</div><div class="rm">발주: 국민체육진흥공단 · 예산: 1억 7,035만원</div><div class="rr"><span class="badge bred">PM 경력</span> 10년 이상 PM 필수. 현재 3년 미충족.</div></div>
+  <div class="rc"><div class="rn">04 · 2026년 축산물품질평가원 통합홍보 용역</div><div class="rm">발주: 축산물품질평가원 · 예산: 3억 400만원</div><div class="rr"><span class="badge bred">PM 경력</span> 정부기관·대기업 PR 5회 이상 임원급 PM 필수.</div></div>
+  <div class="rc"><div class="rn">05 · 2026 강화 생태관광 영상 제작 (과업지시서)</div><div class="rm">발주: 강화군 · 예산: 미명시</div><div class="rr"><span class="badge bred">역량 부족</span> PD 자연다큐멘터리 연출 경험 필수. 해당 경험 없음.</div></div>
+  <div class="rc"><div class="rn">06 · 강화 생태관광 홍보영상 제작 (제안요청서)</div><div class="rm">발주: 강화군 · 예산: 2억원</div><div class="rr"><span class="badge bred">실적 요건</span> 단일건 6,000만원 이상 완료 필수. 공공기관 준공 실적 없음.</div></div>
+  <div class="rc"><div class="rn">07 · 2026년 중장년내일센터 SNS·서포터즈 통합 운영</div><div class="rm">발주: 노사발전재단 · 예산: 1억 5,000만원</div><div class="rr"><span class="badge bred">PM 경력</span> 5년 이상 + 공공기관 서포터즈 운영 경험. <span class="badge bred">입찰보증금</span> 납부 의무.</div></div>
+  <div class="rc"><div class="rn">08 · 2027학년도 경복대학교 입시홍보 영상제작</div><div class="rm">발주: 경복대학교 · 예산: 1억원</div><div class="rr"><span class="badge bred">역량 부족</span> 3D·모션그래픽·드론 필수. <span class="badge bred">공동수급·하도급 불허</span></div></div>
+  <div class="rc"><div class="rn">09 · 2026년 인삼자조금 홍보사업</div><div class="rm">발주: 한국인삼협회 · 예산: 1억 6,000만원</div><div class="rr"><span class="badge bred">실적 요건</span> 1억원 이상 완료 실적 3건 필수. 충족 불가.</div></div>
+  <div class="rc"><div class="rn">10 · 2026년 인구의날 국민인식개선 홍보</div><div class="rm">발주: 한국언론진흥재단 · 예산: 2억원</div><div class="rr"><span class="badge bwarn">보류</span> 제안요청서 미확인. 유사 공고 재공고 시 재검토.</div></div>
+  <div class="rc"><div class="rn">11 · 2026년 러브플랜 상담 홍보리플릿 제작·배부</div><div class="rm">발주: 인구보건복지협회 · 예산: 1,400만원</div><div class="rr"><span class="badge bred">업종 불일치</span> 인쇄사 신고(1518) + 직접생산확인증명서 필수. 보유 없음.</div></div>
+  <div class="rc"><div class="rn">12 · (재공고) 법제처 홍보 콘텐츠 제작 용역</div><div class="rm">발주: 법제처 · 예산: 6,000만원</div><div class="rr"><span class="badge bred">업종 불일치</span> 기타자유업(9999) + 디자인서비스 직접생산확인증명서 필수. 보유 없음.</div></div>
+  <div class="rc"><div class="rn">13 · 2026 SNS 기반 홍보 플랫폼 육성 사업 (인천중구문화재단)</div><div class="rm">발주: 인천중구문화재단 · 예산: 9,790만원</div><div class="rr"><span class="badge bred">PM 경력</span> 3년 이상 + 공공기관 홍보 서포터즈 운영 실무경험 필수.</div></div>
+  <div class="rc"><div class="rn">14 · 2026년 인삼자조금 온·오프라인 정보제공사업 (인삼런)</div><div class="rm">발주: 한국인삼협회 · 예산: 별도</div><div class="rr"><span class="badge bred">역량 부족</span> 1,000명 규모 오프라인 펀런 행사 전체 기획·운영. 실적 및 역량 없음.</div></div>
+  <div class="rc"><div class="rn">15 · 2027학년도 유한대학교 온라인 홍보·광고 용역 (재입찰)</div><div class="rm">발주: 유한대학교 · 예산: 1억 1,781만원 · 제한경쟁 · 마감: 4/24(금) · PT: 4/27(월)</div><div class="rr"><span class="badge bred">실적 요건</span> 대학(교) 온라인 홍보/광고 단일건 8,000만원 이상 실적 필수. 보유 실적 없음 (연암대 포기02와 동일 사유). 경복대 수주 시 내년 재도전 가능.</div></div>
+</div>
+
+<div id="manager" class="page">
+  <div class="mtop">
+    <div><div class="mtitle">입찰 일정 관리 <span class="sdot" id="sdot"></span></div><div style="font-size:11px;color:var(--sub);margin-top:3px" id="mdlbl"></div></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--sub)">기준일</span>
+      <input type="date" class="mdi" id="mdi">
+      <span style="font-size:11px;color:var(--sub)">클릭 펼치기 · 자동저장</span>
+    </div>
+  </div>
+  <div class="ms4">
+    <div class="msc"><div class="msv" id="mA" style="color:var(--green)">0</div><div class="msl">진행 중</div></div>
+    <div class="msc"><div class="msv" id="mU" style="color:var(--red)">0</div><div class="msl">D-3 이내 긴급</div></div>
+    <div class="msc"><div class="msv" id="mC" style="color:var(--blue)">0</div><div class="msl">완료 액션</div></div>
+    <div class="msc"><div class="msv" id="mB" style="color:var(--amber)">0억</div><div class="msl">수주 기회</div></div>
+  </div>
+  <div id="mlist"></div>
+</div>
+
+<div id="dashboard" class="page">
+<style>
+.db-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.db-title{font-size:15px;font-weight:700}
+.db-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.db-stat{background:white;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.db-stat-val{font-size:24px;font-weight:700}
+.db-stat-lbl{font-size:11px;color:var(--sub);margin-top:3px}
+.db-ftabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.db-ftab{padding:5px 14px;border-radius:999px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:white;color:var(--sub);font-family:'Noto Sans KR',sans-serif}
+.db-ftab.on{background:var(--navy);color:white;border-color:var(--navy);font-weight:700}
+.db-bid{background:white;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;position:relative;transition:box-shadow .15s}
+.db-bid:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.db-acc{position:absolute;left:0;top:0;bottom:0;width:4px}
+.db-head{display:flex;align-items:center;gap:12px;padding:13px 18px 13px 22px}
+.db-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0}
+.db-bw{background:var(--green-bg);color:#14532d;border:1px solid var(--green-b)}
+.db-bl{background:var(--red-bg);color:#7f1d1d;border:1px solid var(--red-b)}
+.db-br{background:var(--info-bg);color:#1e40af;border:1px solid var(--info-b)}
+.db-inf{flex:1;min-width:0}
+.db-nm{font-size:13px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-mt{font-size:11px;color:var(--sub)}
+.db-rt{text-align:right;flex-shrink:0}
+.db-pb{font-size:16px;font-weight:700}
+.db-dt{font-size:11px;color:var(--sub);margin-top:2px}
+.db-det{padding:10px 18px 12px 22px;border-top:1px solid var(--border);background:#fafafa;font-size:12px;line-height:1.7}
+.db-empty{text-align:center;padding:60px;color:var(--sub)}
+.db-sbtn{background:var(--navy);color:white;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'Noto Sans KR',sans-serif}
+.db-rbtn{background:white;color:var(--navy);border:1px solid var(--border);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'Noto Sans KR',sans-serif}
+.db-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center}
+.db-modal.show{display:flex}
+.db-mbox{background:white;border-radius:12px;padding:28px;width:460px;max-width:90vw}
+.db-mbox h2{font-size:16px;font-weight:700;margin-bottom:6px}
+.db-mdesc{font-size:12px;color:var(--sub);margin-bottom:20px;line-height:1.6}
+.db-fg{margin-bottom:14px}
+.db-fl{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;display:block}
+.db-fi{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text)}
+.db-fi:focus{outline:none;border-color:var(--blue)}
+.db-fh{font-size:11px;color:var(--sub);margin-top:3px}
+.db-mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.db-cancel{padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:white;color:var(--sub);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px}
+.db-save{padding:8px 16px;border:none;border-radius:6px;background:var(--blue);color:white;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700}
+</style>
+<div class="db-topbar">
+  <div>
+    <div class="db-title">🌐 공고 대시보드</div>
+    <div style="font-size:11px;color:var(--sub);margin-top:3px" id="dbLU">마지막 업데이트: —</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="db-rbtn" onclick="dbLoad()">🔄 새로고침</button>
+    <button class="db-sbtn" onclick="dbOpen()">⚙️ API 설정</button>
+  </div>
+</div>
+<div class="db-stats">
+  <div class="db-stat"><div class="db-stat-val" id="dbT">—</div><div class="db-stat-lbl">전체</div></div>
+  <div class="db-stat"><div class="db-stat-val" id="dbW" style="color:var(--green)">—</div><div class="db-stat-lbl">도전</div></div>
+  <div class="db-stat"><div class="db-stat-val" id="dbL" style="color:var(--red)">—</div><div class="db-stat-lbl">포기</div></div>
+  <div class="db-stat"><div class="db-stat-val" id="dbR" style="color:var(--blue)">—</div><div class="db-stat-lbl">검토중</div></div>
+</div>
+<div class="db-ftabs">
+  <button class="db-ftab on" onclick="dbFlt('all',this)">전체</button>
+  <button class="db-ftab" onclick="dbFlt('win',this)">✅ 도전</button>
+  <button class="db-ftab" onclick="dbFlt('lose',this)">❌ 포기</button>
+  <button class="db-ftab" onclick="dbFlt('review',this)">🔍 검토중</button>
+</div>
+<div id="dbList"></div>
+<div class="db-modal" id="dbModal">
+  <div class="db-mbox">
+    <h2>⚙️ Airtable API 설정</h2>
+    <div class="db-mdesc">입력한 정보는 브라우저에만 저장돼요.</div>
+    <div class="db-fg"><label class="db-fl">Personal Access Token</label><input type="password" class="db-fi" id="dbIT" placeholder="pat으로 시작하는 토큰"><div class="db-fh">Developer Hub에서 발급</div></div>
+    <div class="db-fg"><label class="db-fl">Base ID</label><input type="text" class="db-fi" id="dbIB" placeholder="app으로 시작하는 ID"></div>
+    <div class="db-fg"><label class="db-fl">테이블 ID</label><input type="text" class="db-fi" id="dbITbl" placeholder="tbl로 시작하는 ID"><div class="db-fh">Airtable URL에서 tbl로 시작하는 부분</div></div>
+    <div class="db-mbtns">
+      <button class="db-cancel" onclick="dbClose()">취소</button>
+      <button class="db-save" onclick="dbSave()">저장 후 불러오기</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+// ── 탭 전환 ──
+function go(id, el) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (id === 'manager') initMgr();
+  if (id === 'dashboard') { var c=dbGetC(); if(c.t&&c.b&&c.tbl) dbLoad(); }
+}
+
+// ── 일정관리 ──
+var BIDS = [
+  {id:'p2',name:'대학청년고용서비스 온·오프라인 홍보',org:'한국고용정보원',budget:'1억 5,710만원',bn:1.571,deadline:'2026-04-23',dl:'4/21~23 나라장터',prob:'35~45%',accent:'#dc2626',
+   checks:['나라장터 신용평가등급 B- 등록 확인','인스타 운영사례 3년치 정리','오프라인 협력사 컨택 (커피트럭·포토부스·인형탈)','콘텐츠 우수사례 4종 선별','인플루언서 영상 실적 + 조회수 정리','제안서 전 항목 작성 완료','나라장터 PDF 제출 (300MB 이하)']},
+  {id:'p3',name:'2027학년도 경복대 SNS 입시홍보',org:'경복대학교',budget:'2억원',bn:2.0,deadline:'2026-04-20',dl:'4/20 15:00 마감 · PT 4/22',prob:'40~50%',accent:'#dc2626',
+   checks:['서울보증보험 입찰보증증권 신청 (1,000만원)','국세·지방세 완납증명서 발급','실적증명서 — SNS 홍보 5건 선별','SEO·GDN 외부 파트너 확정','제안서 작성 완료 (30쪽 PPT)','나라장터 전자 제출 (4/20 오전 목표)','4/22 PT 발표 — 제안서 8부 지참']},
+  {id:'p4',name:'소상공인 온라인판로 통합홍보',org:'한국중소벤처기업유통원',budget:'2억 5,000만원',bn:2.5,deadline:'2026-04-23',dl:'4/21~23 나라장터',prob:'40~50%',accent:'#dc2626',
+   checks:['판판대로 채널 현황 분석','smpp.go.kr 창업기업확인서 신청','별지 서식 9종 작성 완료','오프라인·설문 파트너 확정','제안서 작성 완료','나라장터 PDF 제출']},
+  {id:'p5',name:'수도권1순환고속도로 홍보',org:'서울고속도로(주)',budget:'4,950만원',bn:0.495,deadline:'2026-04-22',dl:'4/22(수) 11:00 방문+나라장터',prob:'40~50%',accent:'#d97706',
+   checks:['동양백반·조인·OTM 실적증명서 인감 날인 요청','법인인감증명서·법인등기부등본 발급 (4/10 이후)','4/22 역할 분리 확정 — PT발표자 vs 양주방문제출자','수도권1순환 구간 답사 (일산~퇴계원)','PR·언론홍보 파트너 확정','제안서 30쪽 작성 완료','제본 9부 완료 (4/21 오후까지)','나라장터 전자 제출 완료','031-894-3090 방문 사전 연락 후 양주 제출']},
+  {id:'p6',name:'산단 행복일터 홍보 운영',org:'한국산업단지경영자연합회',budget:'1억원',bn:1.0,deadline:'2026-04-30',dl:'4/30(목) 18:00 이메일',prob:'45~55%',accent:'#2563eb',
+   checks:['guro&#64;naver&#46;com 공식 이메일 진위 확인','PR·디지털 광고 파트너 확정','제안서 작성 (4/23 이후)','가격제안서 작성','참여인력 이력·투입계획서 작성','유사실적 증빙 준비','국세·지방세 완납증명서 발급','이메일 제출 완료']}
+];
+var STATS = [
+  {key:'active',label:'진행 중'},{key:'progress',label:'작성 중'},
+  {key:'submitted',label:'제출완료'},{key:'won',label:'낙찰'},
+  {key:'lost',label:'탈락'},{key:'skip',label:'포기'}
+];
+var mBase = new Date();
+var mInited = false;
+
+function initMgr() {
+  if (mInited) return;
+  mInited = true;
+  var inp = document.getElementById('mdi');
+  inp.value = fmtDate(mBase);
+  inp.addEventListener('change', function(){
+    mBase = new Date(this.value + 'T00:00:00');
+    mgrAll();
+  });
+  mgrAll();
+}
+
+function fmtDate(d) {
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function gS(id) {
+  try { var r = localStorage.getItem('snp4_'+id); if(r) return JSON.parse(r); } catch(e) {}
+  return {status:'active', checks:{}, memo:''};
+}
+function sS(id, s) {
+  try { localStorage.setItem('snp4_'+id, JSON.stringify(s)); flash(); } catch(e) {}
+}
+var ft;
+function flash() {
+  var d = document.getElementById('sdot');
+  d.classList.add('on');
+  clearTimeout(ft);
+  ft = setTimeout(function(){ d.classList.remove('on'); }, 2000);
+}
+function dday(dl) {
+  return Math.ceil((new Date(dl+'T00:00:00') - mBase) / 86400000);
+}
+function ddBadge(bid, status) {
+  if (status==='won') return {t:'🏆 낙찰', c:'dok'};
+  if (status==='lost') return {t:'탈락', c:'ddn'};
+  if (status==='skip') return {t:'포기', c:'ddn'};
+  if (status==='submitted') return {t:'제출완료', c:'ddn'};
+  var d = dday(bid.deadline);
+  if (d < 0) return {t:'마감', c:'ddn'};
+  if (d === 0) return {t:'D-Day', c:'dur'};
+  if (d <= 3) return {t:'D-'+d, c:'dur'};
+  if (d <= 7) return {t:'D-'+d, c:'dwn'};
+  return {t:'D-'+d, c:'dok'};
+}
+function mgrSum() {
+  var a=0,u=0,c=0,b=0;
+  BIDS.forEach(function(bid){
+    var s = gS(bid.id);
+    if(['active','progress','submitted'].indexOf(s.status)>-1) a++;
+    var d = dday(bid.deadline);
+    if(['active','progress'].indexOf(s.status)>-1 && d>=0 && d<=3) u++;
+    bid.checks.forEach(function(_,i){ if(s.checks && s.checks[i]) c++; });
+    if(['skip','lost'].indexOf(s.status)===-1) b += bid.bn;
+  });
+  document.getElementById('mA').textContent = a;
+  document.getElementById('mU').textContent = u;
+  document.getElementById('mC').textContent = c;
+  document.getElementById('mB').textContent = b.toFixed(1)+'억';
+}
+function mgrAll() {
+  var now = mBase;
+  var days = ['일','월','화','수','목','금','토'];
+  document.getElementById('mdlbl').textContent =
+    now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일 ('+days[now.getDay()]+') 기준';
+  mgrRender();
+  mgrSum();
+}
+function mgrRender() {
+  var con = document.getElementById('mlist');
+  var exp = {};
+  var cards = con.querySelectorAll('.mc.exp');
+  for(var i=0;i<cards.length;i++) exp[cards[i].id] = true;
+  con.innerHTML = '';
+  BIDS.forEach(function(bid){
+    var s = gS(bid.id);
+    var status = s.status;
+    var dd = ddBadge(bid, status);
+    var si = STATS.filter(function(x){ return x.key===status; })[0] || STATS[0];
+    var done = Object.values(s.checks||{}).filter(Boolean).length;
+    var total = bid.checks.length;
+    var pct = total ? Math.round(done/total*100) : 0;
+    var bc = pct===100 ? '#16a34a' : pct>50 ? '#d97706' : '#dc2626';
+    var card = document.createElement('div');
+    card.className = 'mc' + (exp['mc_'+bid.id] ? ' exp' : '');
+    card.id = 'mc_'+bid.id;
+
+    var stBtns = STATS.map(function(x){
+      return '<button class="mstn '+(status===x.key?'x'+x.key:'')+'" onclick="mStat(\''+bid.id+'\',\''+x.key+'\')">'+x.label+'</button>';
+    }).join('');
+
+    var chkItems = bid.checks.map(function(c,i){
+      var isDone = s.checks && s.checks[i];
+      return '<label class="mci '+(isDone?'done':'')+'"><input type="checkbox" '+(isDone?'checked':'')+' onchange="mChk(\''+bid.id+'\','+i+',this.checked)">'+c+'</label>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="mca" style="background:'+bid.accent+'"></div>'+
+      '<div class="mh" onclick="mTog(\''+bid.id+'\')">'+
+        '<span class="mdd '+dd.c+'">'+dd.t+'</span>'+
+        '<div class="mi"><div class="mn">'+bid.name+'</div><div class="mo">'+bid.org+' · '+bid.budget+' · '+bid.dl+'</div></div>'+
+        '<div class="mr2"><span class="mcnt">'+done+'/'+total+'</span><span class="msb s'+status+'">'+si.label+'</span><span class="mchv">▼</span></div>'+
+      '</div>'+
+      '<div class="mpb"><div class="mpf" style="width:'+pct+'%;background:'+bc+'"></div></div>'+
+      '<div class="mb">'+
+        '<div class="mmt"><div class="mmi"><strong>예산</strong> '+bid.budget+'</div><div class="mmi"><strong>확률</strong> '+bid.prob+'</div><div class="mmi"><strong>마감</strong> '+bid.dl+'</div></div>'+
+        '<div class="mlbl">상태</div><div class="msr">'+stBtns+'</div>'+
+        '<div class="mlbl" id="cl_'+bid.id+'">액션 체크리스트 ('+done+' / '+total+' 완료)</div>'+
+        '<div class="mck">'+chkItems+'</div>'+
+        '<div class="mlbl">진행 메모</div>'+
+        '<textarea class="mmo" placeholder="진행 상황, 담당자 연락처, 특이사항..." oninput="mMemo(\''+bid.id+'\',this.value)">'+(s.memo||'')+'</textarea>'+
+      '</div>';
+    con.appendChild(card);
+  });
+}
+function mTog(id){ document.getElementById('mc_'+id).classList.toggle('exp'); }
+function mStat(id,status){ var s=gS(id); s.status=status; sS(id,s); mgrAll(); }
+function mChk(id,idx,val){
+  var s=gS(id); if(!s.checks) s.checks={};
+  s.checks[idx]=val; sS(id,s);
+  var card=document.getElementById('mc_'+id);
+  var labels=card.querySelectorAll('.mci');
+  if(labels[idx]){ if(val) labels[idx].classList.add('done'); else labels[idx].classList.remove('done'); }
+  var bid=BIDS.filter(function(b){ return b.id===id; })[0];
+  var done=Object.values(s.checks).filter(Boolean).length;
+  var total=bid.checks.length;
+  var pct=Math.round(done/total*100);
+  var bc=pct===100?'#16a34a':pct>50?'#d97706':'#dc2626';
+  var bar=card.querySelector('.mpf');
+  if(bar){bar.style.width=pct+'%';bar.style.background=bc;}
+  var cnt=card.querySelector('.mcnt');
+  if(cnt) cnt.textContent=done+'/'+total;
+  var cl=document.getElementById('cl_'+id);
+  if(cl) cl.textContent='액션 체크리스트 ('+done+' / '+total+' 완료)';
+  mgrSum();
+}
+
+var dbRecs=[],dbFlt2='all';
+function dbGetC(){return{t:localStorage.getItem('db_t')||'',b:localStorage.getItem('db_b')||'',tbl:localStorage.getItem('db_tbl')||''};}
+function dbOpen(){var c=dbGetC();document.getElementById('dbIT').value=c.t;document.getElementById('dbIB').value=c.b;document.getElementById('dbITbl').value=c.tbl;document.getElementById('dbModal').classList.add('show');}
+function dbClose(){document.getElementById('dbModal').classList.remove('show');}
+function dbSave(){var t=document.getElementById('dbIT').value.trim(),b=document.getElementById('dbIB').value.trim(),tbl=document.getElementById('dbITbl').value.trim();if(!t||!b||!tbl){alert('모두 입력해주세요.');return;}localStorage.setItem('db_t',t);localStorage.setItem('db_b',b);localStorage.setItem('db_tbl',tbl);dbClose();dbLoad();}
+function dbAc(j){if(!j)return'#9ca3af';if(j.includes('도전'))return'#16a34a';if(j.includes('포기'))return'#dc2626';return'#2563eb';}
+function dbBdg(j){if(!j)return'db-br';if(j.includes('도전'))return'db-bw';if(j.includes('포기'))return'db-bl';return'db-br';}
+function dbCard(r){var f=r.fields||{},j=f['판단']||'검토중🔍',c=dbAc(j),d=f['분석내용']||f['포기사유']||'';return'<div class="db-bid"><div class="db-acc" style="background:'+c+'"></div><div class="db-head"><span class="db-badge '+dbBdg(j)+'">'+j+'</span><div class="db-inf"><div class="db-nm">'+(f['공고명']||'—')+'</div><div class="db-mt">'+(f['발주기관']||'—')+' · '+(f['예산']||'—')+' · 마감 '+(f['마감일']||'—')+'</div></div><div class="db-rt"><div class="db-pb" style="color:'+c+'">'+(f['수주확률']||'—')+'</div><div class="db-dt">수집 '+(f['수집일']||'')+'</div></div></div>'+(d?'<div class="db-det">'+d+'</div>':'')+'</div>';}
+function dbRender(){var filtered=dbRecs;if(dbFlt2==='win')filtered=dbRecs.filter(function(r){return(r.fields['판단']||'').includes('도전');});if(dbFlt2==='lose')filtered=dbRecs.filter(function(r){return(r.fields['판단']||'').includes('포기');});if(dbFlt2==='review')filtered=dbRecs.filter(function(r){return(r.fields['판단']||'').includes('검토');});var el=document.getElementById('dbList');el.innerHTML=filtered.length?filtered.map(dbCard).join(''):'<div class="db-empty">📭 해당 공고 없어요</div>';}
+function dbFlt(type,el){dbFlt2=type;document.querySelectorAll('.db-ftab').forEach(function(t){t.classList.remove('on');});el.classList.add('on');dbRender();}
+function dbLoad(){var c=dbGetC();if(!c.t||!c.b||!c.tbl){document.getElementById('dbList').innerHTML='<div class="db-empty">⚙️ API 설정 버튼을 눌러 Airtable 정보를 입력해주세요</div>';return;}document.getElementById('dbList').innerHTML='<div class="db-empty">불러오는 중...</div>';fetch('https://api.airtable.com/v0/'+c.b+'/'+c.tbl+'?sort[0][field]=수집일&sort[0][direction]=desc&maxRecords=200',{headers:{'Authorization':'Bearer '+c.t}}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(data){dbRecs=data.records||[];var now=new Date();document.getElementById('dbLU').textContent='마지막 업데이트: '+now.getFullYear()+'.'+(now.getMonth()+1)+'.'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');var w=dbRecs.filter(function(r){return(r.fields['판단']||'').includes('도전');}).length,l=dbRecs.filter(function(r){return(r.fields['판단']||'').includes('포기');}).length,rv=dbRecs.filter(function(r){return(r.fields['판단']||'').includes('검토');}).length;document.getElementById('dbT').textContent=dbRecs.length;document.getElementById('dbW').textContent=w;document.getElementById('dbL').textContent=l;document.getElementById('dbR').textContent=rv;dbRender();}).catch(function(e){document.getElementById('dbList').innerHTML='<div class="db-empty">❌ 불러오기 실패: '+e.message+'<br><br><button class="db-sbtn" onclick="dbOpen()">API 설정 확인</button></div>';});}
+
+function mMemo(id,val){ var s=gS(id); s.memo=val; sS(id,s); }
+</script>
+</body>
+</html>
